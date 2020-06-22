@@ -1,0 +1,8 @@
+CFLAGS = -I/usr/local/include -I. -g -Wall
+all: rtty-pi
+
+rtty-pi: hack-pi.o
+	cc -o rtty-pi hack-pi.o -L/usr/local/lib -lwiringPi
+hack-pi.o: wiringPi.h
+clean: 
+	rm -f hack-pi.o rtty-pi

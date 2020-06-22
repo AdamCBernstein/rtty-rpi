@@ -1,0 +1,159 @@
+(GUARDIAN)  John  German  has barely had time to catch his breath
+all week between appearances on TV news channel and radio  phone‐
+in shows. Heâs an unlikely media star, not a pop singer or reali‐
+ty TV contestant, but a grey‐haired  automotive  engineer  thrust
+into  the global spotlight after he and his colleagues were cred‐
+ited with helping uncover one of the biggest ever corporate scan‐
+dals.
+
+âWe  really  didn't  expect to find anything,â German said of his
+research that found Volkswagen had installed sophisticated  soft‐
+ware  designed  to  cheat strict emission tests across the world.
+His simple test â checking the  carâs  emissions  on  real  roads
+rather  than  in  lab test conditions â led to the resignation of
+VWâs chief executive after the German company was forced to admit
+it  installed âdefeat devicesâ in 11m cars. The scandal has wiped
+more than â¬24bn ($26.8bn) off VWâs market value.
+
+Many questions remain but one thing is clear to German:  âIt  was
+not an accident,â he said. âA lot of work has gone into this.â
+
+When  German  finally found a moment of peace this week he called
+his wife in Ann Arbor, Michigan. âShe said: âYou know youâve made
+it  now,  you  can  retire  and  be very happyâ,â German told the
+Guardian as he prepared to board a plane back to Michigan after a
+week  in the spotlight in Washington DC. âNo, no, no, I canât af‐
+ford to yet,â German told his disappointed wife.
+
+He may have helped uncover one of the worldâs  biggest  corporate
+scandals,  but  German earns a modest salary as US co‐lead of the
+International Council on Clean Transportation (ICCT) a small non‐
+profit  organisation dedicated to helping to reduce vehicle emis‐
+sions and has an annual budget of just $12m.
+
+âIt has been totally overwhelming,â German said of the global in‐
+terest  in  his research this week. âIâve been doing nothing else
+[but responding to the media and politicians] for 12 hours a  day
+since  Friday,â  when  US  regulators  announced  their  findings
+against VW based on Germanâs research] âWeâre a  small  organisa‐
+tion  that primarily deals with information on diesel filters, so
+this is unprecedented and overwhelming.  Advertisement
+
+âAs an organisation that is trying to reduce  emissions  and  im‐
+prove  efficiency it is always gratifying to see results from our
+work, but we never dreamed we would have this kind of impact.â
+
+German explained that the idea to carry out the  test,  which  he
+described  as  âvery ordinaryâ, came from Peter Mock, a colleague
+in Europe, who noticed discrepancies  in  the  emissions  of  the
+diesel  VW Passat and VW Jetta. He said they decided to carry out
+on‐the‐road tests in the US as the emissions regulations are much
+stricter  than in the EU. They expected the cars to pass and they
+could use this as proof to show Europeans that it was possible to
+run diesels with cleaner emissions.
+
+German, who has a degree in physics from the University of Michi‐
+gan and said he âgot over halfway through an MBA before  he  came
+to  his  sensesâ,  sought out the assistance of the West Virginia
+Universityâs Center for Alternative Fuels, Engines and Emissions.
+The  WVU  provided  a  portable  emission measurement system that
+could be put in the carâs boot (trunk)  with  an  attached  probe
+placed in the exhaust pipe.
+
+Then  German  sourced  a  Passat,  Jetta and a BMW X5 (which also
+showed emissions  discrepancies  in  Europe)  and  âhad  a  drive
+aroundâ.  âThe  VWs were massively exceeding their official emis‐
+sions readings in normal driving conditions, which was completely
+inexplicable  and  totally surprised us,â German said.  The Volk‐
+swagen emissions scandal explained Read more
+
+Thinking it must be a technical error, the  tests  were  expanded
+and  the cars were driven more than 1,200 miles from San Diego to
+Seattle â almost the entire length of the west coast of the US.
+
+The VWs nitrogen oxide emissions â which  creates  smog  and  has
+been  linked  to  increased  asthma attacks and other respiratory
+illnesses â still exceeded the US standards by up  to  35  times.
+The BMW X5 was within the regulated range.
+
+Arvind  Thiruvengadam, a research assistant professor at WVU, who
+conducted the tests said: âWe were  doubting  ourselves  and  our
+procedures and making sure to double check that we were not doing
+anything wrong. We did so much testing we couldnât possibly doing
+the same mistake again and again.
+
+âWe  were like âOK, weâre going to write a lot of journal papers,
+and weâll be happy if three people read these  journal  papers,ââ
+he told National Public Radio last week. âThatâs our happiness at
+that point.â Advertisement
+
+German published the research in May 2014 and handed it  over  to
+the  Environment  Protection Agency (EPA). âThere was an expecta‐
+tion that they would find out what was causing  the  higher‐than‐
+expected  emissions,â he said. âWe did send a courtesy copy to VW
+to say âvehicles B and C are your vehicles and you might like  to
+knowâ, we had no response.â
+
+There  was  no response from the EPA either, but keen‐eyed German
+noticed an EPA press release in which VW agreed to recall  almost
+500,000 vehicles in December 2014 to reinstall software, which it
+said would solve the higher‐than‐expected emissions.
+
+However, a couple of months later the  California  Air  Resources
+Board (Carb) carried out spot checks and discovered that the âde‐
+feat deviceâ software â used to dramatically reduces nitrogen ox‐
+ide  (NOx)  emissions  only  when  the cars are undergoing strict
+emission tests â was still present.
+
+âThat is actually the single most inexplicable thing  about  this
+whole  business,â  German said. âVW had a chance to fix the prob‐
+lem, and they continued to try and cheat and  do  what  they  had
+done. Thatâs just amazing.â
+
+âOnly  then  did  VW admit it had designed and installed a defeat
+device in these vehicles in the form of a sophisticated  software
+algorithm  that  detected when a vehicle was undergoing emissions
+testing,â the EPA said in a statement last week.
+
+German said it was unclear how the defeat device software worked,
+but  the software could work by detecting periods when the steer‐
+ing column wasnât turning but the wheels were which  would  indi‐
+cate the car was on dynamo‐meters for testing, or could also test
+for the precise uniform temperature that the  tests  are  carried
+out at.
+
+âThe  kind of software it takes to first detect when youâre driv‐
+ing on the official test would be very hard to develop. And  then
+you  would  need  duplicate  software to tell the car to have two
+different emission controls.â UK, France and Germany lobbied  for
+flawed car emissions tests, documents reveal Read more
+
+He said it was impossible to know how far up the food chain at VW
+the fraudulent activity went, but said: âIt would have had to  be
+quite  a  few  people involved. It certainly wonât have just been
+one individual.â
+
+German said VW could have continued in the deceit for  the  fore‐
+seeable  future  if no one had thought to test the cars emissions
+on real roads. He said there is no way to know if other car  com‐
+panies may also have been using similar methods to trick official
+emission tests, but welcomed UK, German and US  regulators  moves
+to retest cars emissions on real roads.
+
+German, who drives a 1997 Honda Accord station wagon that he says
+has pretty good emissions for  a  manual  transmission,  said  he
+hopes his work will act as a wake‐up call and scare the whole in‐
+dustry into making certain that their vehicles  comply  with  all
+emissions  regulations.  âCompanies should realise they might get
+away with stuff for a little while, but it  will  catch  up  with
+them.â
+
+He  refused  to  enter  into discussion about what sort of action
+should be taken against VW, which is facing a fine of up to $16bn
+in  the  US  alone and a possible criminal investigation. âThatâs
+really up to others, Iâm just an engineer from Michigan itâs  re‐
+ally beyond my field of reach.â1
+
+
+The Guardian 09-26-2015
+NNNN
