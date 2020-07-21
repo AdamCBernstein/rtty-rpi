@@ -65,6 +65,9 @@ typedef struct rtty_conf
     int shift;
     int column;
     int test_count;
+    int sec_sleep;
+    int milli_sleep;
+    int no_init;
 } rtty_conf;
 
 void encode_bit(rtty_conf *ctx, int c);
@@ -116,9 +119,11 @@ Usage(void) {
             " Valid options with their default values are:\n"
             "   TTY options:\n"
             "     --input-file IN_FILE\n"
-            "     --test-data\n"
+            "     --test-data [N]; default N=1\n"
             "     --keyboard\n"
             "     --wpm 60 | 66 | 100\n"
+            "     --char-delay sec\n"
+            "     --no-init\n"
             );
             
     exit(1);
@@ -178,6 +183,7 @@ int main(int argc, char **argv)
         }
         else if (!strcmp(argv[i], "--test-data")) {
             test_data = 1;
+            ctx.test_count = 1;
             if ((i+1) < argc && atoi(argv[i+1]) > 1) {
                 ctx.test_count = atoi(argv[i+1]);
             }
@@ -191,6 +197,43 @@ int main(int argc, char **argv)
             if (i >= argc)
                 Usage();
             ctx.filename = argv[i];
+        }
+        else if (!strcmp(argv[i], "--no-init")) {
+            ctx.no_init = 1;
+	}
+        else if (!strcmp(argv[i], "--char-delay")) {
+            char *b;
+            char *e;
+            i++;
+            if (i >= argc)
+                Usage();
+            b = argv[i];
+            ctx.sec_sleep = strtol(b, &e, 10);
+            if (e == b) {
+                ctx.sec_sleep = 0;
+            }
+            else if (e[0] == '.' && e[1] != '\0') {
+                b = e+1;
+                ctx.milli_sleep = strtol(b, &e, 10);
+                if (e == b) {
+                    ctx.milli_sleep = 0;
+                }
+                else {
+                    /* 0.1 = 100ms, 0.001 = 1ms */
+                    switch (e-b) {
+                        case 2:
+                            ctx.milli_sleep *= 10;
+                            break;
+                        case 1:
+                            ctx.milli_sleep *= 100;
+                    }
+                }
+            }
+            if (ctx.sec_sleep < 0 || ctx.sec_sleep > 10) {
+                /* Be nice and give a second betweeen characters */
+                ctx.sec_sleep = 1;
+                ctx.milli_sleep = 0;
+            }
         }
         else {
             Usage();
@@ -324,6 +367,9 @@ void print_line(rtty_conf *ctx, char *line)
 
 void initialize_tty(rtty_conf *ctx)
 {
+    if (ctx->no_init) {
+        return;
+    }
     encode_to_baudot(ctx, CHAR_NULL);
     encode_to_baudot(ctx, CHAR_NULL);
     encode_to_baudot(ctx, CHAR_SHIFT_DOWN);
@@ -383,6 +429,10 @@ void print_char(rtty_conf *ctx, char c)
         encode_to_baudot(ctx, CHAR_CR);
         printf("\r\n");
         ctx->column = 0;
+    }
+    if (ctx->sec_sleep > 0 || ctx->milli_sleep > 0) {
+        sleep(ctx->sec_sleep);
+        usleep(ctx->milli_sleep * 1000);
     }
 }
 
