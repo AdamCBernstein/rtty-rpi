@@ -10,3 +10,8 @@ void digitalWrite(int pin, int value)
 void pinMode(int pin, int mode)
 {
 }
+
+
+void delayMicroseconds(unsigned int howLong)
+{
+}
