@@ -1,7 +1,7 @@
 package wiringpi
 
 const (
-	GPIO_PIN0 = iota - 1
+	GPIO_PIN0 = iota
 	GPIO_PIN1
 	GPIO_PIN2
 	GPIO_PIN3

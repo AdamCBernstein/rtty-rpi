@@ -3,8 +3,7 @@ package baudot
 import (
 	"fmt"
 	wp "rtty/gpio"
-	"strings"
-	"time"
+	"unicode"
 )
 
 type Baudot interface {
@@ -147,7 +146,7 @@ var baudotChars = []baudotBits{
 // Convert input character to intermediate Baudot representation, a
 // numeric value in the rate 0-31.
 func intValues(v rune, c *convert) ([]int, bool) {
-	var retValues []int
+	var retValues = make([]int, 0, 16)
 
 	// Convert punction character first
 	if val, ok := ascii2Punctuation[v]; ok {
@@ -188,17 +187,15 @@ func asciiToBaudot(v int) baudotBits {
 }
 
 func writeBits(bits baudotBits) {
-	delay := time.Millisecond * (BAUD_DELAY_45 / 1000)
 	for _, bit := range bits {
 		wp.WriteBit(bit)
-		time.Sleep(delay)
+		wp.DelayMicroseconds(BAUD_DELAY_45)
 	}
-	time.Sleep(delay / 2)
 }
 
 func printRune(r rune, c *convert) {
 	if vals, ok := intValues(r, c); ok {
-		fmt.Printf("%s", strings.ToUpper(string(r)))
+		fmt.Printf("%c", unicode.ToUpper(r))
 		for _, val := range vals {
 			bits := asciiToBaudot(val)
 			writeBits(bits)
