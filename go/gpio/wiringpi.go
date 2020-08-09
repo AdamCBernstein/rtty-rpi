@@ -10,9 +10,21 @@ func Initialize(pin int) {
 }
 
 func WriteBitOn() {
-	C.digitalWrite(0, C.HIGH)
+	C.digitalWrite(0, C.LOW)
 }
 
 func WriteBitOff() {
-	C.digitalWrite(0, C.LOW)
+	C.digitalWrite(0, C.HIGH)
+}
+
+func WriteBit(bit bool) {
+	if bit {
+		C.digitalWrite(0, C.LOW)
+	} else {
+		C.digitalWrite(0, C.HIGH)
+	}
+}
+
+func DelayMicroseconds(delay uint) {
+	C.delayMicroseconds(C.uint(delay))
 }

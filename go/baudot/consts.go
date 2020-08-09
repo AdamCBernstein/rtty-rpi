@@ -1,12 +1,15 @@
 package baudot
 
-// import wp "rtty/gpio"
-
 // Baud speed durations
 const (
-	BAUD_DELAY_45 = 22000 /* 22ms = 45 baud, 60WPM */
-	BAUD_DELAY_50 = 20000 /* 20ms = 50 baud, 66WPM */
-	BAUD_DELAY_74 = 13470 /* 13ms = 74 baud, 100WPM */
+	BAUD_DELAY_45 = 22000 /* 22ms = 45 baud, 60WPM; in uSeconds */
+	BAUD_DELAY_50 = 20000 /* 20ms = 50 baud, 66WPM; in uSeconds*/
+	BAUD_DELAY_74 = 13470 /* 13ms = 74 baud, 100WPM; in uSeconds*/
+)
+
+// Misc constants
+const (
+	COLUMN_MAX = 76
 )
 
 // ASCII to Baudot constants

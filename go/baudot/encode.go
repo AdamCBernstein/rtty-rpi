@@ -1,7 +1,11 @@
 package baudot
 
-import wp "rtty/gpio"
-import "time"
+import (
+	"fmt"
+	wp "rtty/gpio"
+	"strings"
+	"time"
+)
 
 type Baudot interface {
 	Print()
@@ -100,47 +104,44 @@ var ascii2Characters = map[rune]int{
 	' ': CHAR_SPACE,
 }
 
-var baudotChars = []baudotBits{
-	{false, true, true, false, false, false, true, true},     /* A */
-	{false, true, false, false, true, true, true, true},      /* B */
-	{false, false, true, true, true, false, true, true},      /* C */
-	{false, true, false, false, true, false, true, true},     /* D */
-	{false, true, false, false, false, false, true, true},    /* E / 3 */
-	{false, true, false, true, true, false, true, true},      /* F */
-	{false, false, true, false, true, true, true, true},      /* G */
-	{false, false, false, true, false, true, true, true},     /* H */
-	{false, false, true, true, false, false, true, true},     /* I  / 8 */
-	{false, true, true, false, true, false, true, true},      /* J */
-	{false, true, true, true, true, false, true, true},       /* K */
-	{false, false, true, false, false, true, true, true},     /* L */
-	{false, false, false, true, true, true, true, true},      /* M / . */
-	{false, false, false, true, true, false, true, true},     /* N */
-	{false, false, false, false, true, true, true, true},     /* O / 9 */
-	{false, false, true, true, false, true, true, true},      /* P / false */
-	{false, true, true, true, false, true, true, true},       /* Q / true  */
-	{false, false, true, false, true, false, true, true},     /* R / 4 */
-	{false, true, false, true, false, false, true, true},     /* S */
-	{false, false, false, false, false, true, true, true},    /* T / 5 */
-	{false, true, true, true, false, false, true, true},      /* U / 7 */
-	{false, false, true, true, true, true, true, true},       /* V */
-	{false, true, true, false, false, true, true, true},      /* W / 2 */
-	{false, true, false, true, true, true, true, true},       /* X / / */
-	{false, true, false, true, false, true, true, true},      /* Y / 6 */
-	{false, true, false, false, false, true, true, true},     /* Z */
-	{false, false, false, false, false, false, true, true},   /* NULL */
-	{false, false, true, false, false, false, true, true},    /* LF */
-	{false, false, false, true, false, false, true, true},    /* SPACE */
-	{false, false, false, false, true, false, true, true},    /* CR */
-	{false, true, true, false, true, true, true, true},       /* SHIFT_UP */
-	{false, true, true, true, true, true, true, true},        /* SHIFT_DOWN */
-	{false, false, false, false, false, false, false, false}, /* Open */
-	{true, true, true, true, true, true, true, true},         /* closed */
-}
+// Define _true so it is as long as "false" to keep below table aligned
+const _true = true
 
-func New() *convert {
-	return &convert{
-		baudotTable: baudotChars,
-	}
+var baudotChars = []baudotBits{
+	{false, _true, _true, false, false, false, _true, _true}, /* A */
+	{false, _true, false, false, _true, _true, _true, _true}, /* B */
+	{false, false, _true, _true, _true, false, _true, _true}, /* C */
+	{false, _true, false, false, _true, false, _true, _true}, /* D */
+	{false, _true, false, false, false, false, _true, _true}, /* E / 3 */
+	{false, _true, false, _true, _true, false, _true, _true}, /* F */
+	{false, false, _true, false, _true, _true, _true, _true}, /* G */
+	{false, false, false, _true, false, _true, _true, _true}, /* H */
+	{false, false, _true, _true, false, false, _true, _true}, /* I  / 8 */
+	{false, _true, _true, false, _true, false, _true, _true}, /* J */
+	{false, _true, _true, _true, _true, false, _true, _true}, /* K */
+	{false, false, _true, false, false, _true, _true, _true}, /* L */
+	{false, false, false, _true, _true, _true, _true, _true}, /* M / . */
+	{false, false, false, _true, _true, false, _true, _true}, /* N */
+	{false, false, false, false, _true, _true, _true, _true}, /* O / 9 */
+	{false, false, _true, _true, false, _true, _true, _true}, /* P / false */
+	{false, _true, _true, _true, false, _true, _true, _true}, /* Q / _true  */
+	{false, false, _true, false, _true, false, _true, _true}, /* R / 4 */
+	{false, _true, false, _true, false, false, _true, _true}, /* S */
+	{false, false, false, false, false, _true, _true, _true}, /* T / 5 */
+	{false, _true, _true, _true, false, false, _true, _true}, /* U / 7 */
+	{false, false, _true, _true, _true, _true, _true, _true}, /* V */
+	{false, _true, _true, false, false, _true, _true, _true}, /* W / 2 */
+	{false, _true, false, _true, _true, _true, _true, _true}, /* X / / */
+	{false, _true, false, _true, false, _true, _true, _true}, /* Y / 6 */
+	{false, _true, false, false, false, _true, _true, _true}, /* Z */
+	{false, false, false, false, false, false, _true, _true}, /* NULL */
+	{false, false, _true, false, false, false, _true, _true}, /* LF */
+	{false, false, false, _true, false, false, _true, _true}, /* SPACE */
+	{false, false, false, false, _true, false, _true, _true}, /* CR */
+	{false, _true, _true, false, _true, _true, _true, _true}, /* SHIFT_UP */
+	{false, _true, _true, _true, _true, _true, _true, _true}, /* SHIFT_DOWN */
+	{false, false, false, false, false, false, false, false}, /* Open */
+	{_true, _true, _true, _true, _true, _true, _true, _true}, /* closed */
 }
 
 // Convert input character to intermediate Baudot representation, a
@@ -155,12 +156,14 @@ func intValues(v rune, c *convert) ([]int, bool) {
 			if c.shift {
 				c.shift = false
 				retValues = append(retValues, CHAR_SHIFT_DOWN)
-				retValues = append(retValues, CHAR_LF)
-				retValues = append(retValues, CHAR_CR)
 			}
-		} else if !c.shift {
-			c.shift = true
-			retValues = append(retValues, CHAR_SHIFT_UP)
+			retValues = append(retValues, CHAR_LF)
+			retValues = append(retValues, CHAR_CR)
+		} else {
+			if !c.shift {
+				c.shift = true
+				retValues = append(retValues, CHAR_SHIFT_UP)
+			}
 			retValues = append(retValues, val)
 		}
 	} else if val, ok = ascii2Characters[v]; ok {
@@ -184,29 +187,35 @@ func asciiToBaudot(v int) baudotBits {
 	return baudotChars[v]
 }
 
-func (c *convert) Print(line string) {
-	for cv := range line {
-		if vals, ok := intValues(rune(cv), c); ok {
-			for _, val := range vals {
-				bits := asciiToBaudot(val)
-				writeBits(bits)
-			}
+func writeBits(bits baudotBits) {
+	delay := time.Millisecond * (BAUD_DELAY_45 / 1000)
+	for _, bit := range bits {
+		wp.WriteBit(bit)
+		time.Sleep(delay)
+	}
+	time.Sleep(delay / 2)
+}
+
+func printRune(r rune, c *convert) {
+	if vals, ok := intValues(r, c); ok {
+		fmt.Printf("%s", strings.ToUpper(string(r)))
+		for _, val := range vals {
+			bits := asciiToBaudot(val)
+			writeBits(bits)
 		}
 	}
 }
 
-func writeBits(bits baudotBits) {
-	delay := BAUD_DELAY_45 / 1000 * time.Millisecond
-        wp.WriteBitOff()
-        time.Sleep(delay)
-	for bit := range bits {
-		if bit > 0 {
-	                wp.WriteBitOn()
-		} else {
-            	    wp.WriteBitOff()
-		}
-        	time.Sleep(delay)
-	}
-        wp.WriteBitOn()
-        time.Sleep(delay)
+func printRaw(val int, c *convert) {
+	bits := asciiToBaudot(val)
+	writeBits(bits)
+}
+
+func initializeTeletype(c *convert) {
+	// Initialize teletype
+	printRaw(CHAR_NULL, c)
+	printRaw(CHAR_NULL, c)
+	printRaw(CHAR_SHIFT_DOWN, c)
+	printRaw(CHAR_CR, c)
+	printRaw(CHAR_LF, c)
 }
