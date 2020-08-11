@@ -17,6 +17,129 @@ type convert struct {
 	shift       bool
 }
 
+const I = true
+const O = false
+const shiftUp = '\x02'
+const shiftDown = '\x01'
+const lineFeed = '\n'
+const carriageReturn = '\r'
+const spaceCharacter = ' '
+const nullChar = '\xfe'
+
+// ITA-2 / US-TTY table. Reference:
+// https://en.wikipedia.org/wiki/Baudot_code#ITA_2_and_US-TTY
+//
+// format: bit0 = up/down shift
+//         bit1-bit7 = start/data5/stop
+var baudotConv = map[rune]baudotBits{
+	// All entries here are LETTERS; bit0 = O
+	/* 0   */ 'A': {O, O, I, I, O, O, O, I}, /* A / - */
+	/* 1   */ 'B': {O, O, I, O, O, I, I, I}, /* B / ? */
+	/* 2   */ 'C': {O, O, O, I, I, I, O, I}, /* C / : */
+	/* 3   */ 'D': {O, O, I, O, O, I, O, I}, /* D / $ */
+	/* 4   */ 'E': {O, O, I, O, O, O, O, I}, /* E / 3 */
+	/* 5   */ 'F': {O, O, I, O, I, I, O, I}, /* F */
+	/* 6   */ 'G': {O, O, O, I, O, I, I, I}, /* G */
+	/* 7   */ 'H': {O, O, O, O, I, O, I, I}, /* H */
+	/* 8   */ 'I': {O, O, O, I, I, O, O, I}, /* I / 8 */
+	/* 9   */ 'J': {O, O, I, I, O, I, O, I}, /* J / ' */
+	/*10   */ 'K': {O, O, I, I, I, I, O, I}, /* K / ( */
+	/*11   */ 'L': {O, O, O, I, O, O, I, I}, /* L / ) */
+	/*12   */ 'M': {O, O, O, O, I, I, I, I}, /* M / . */
+	/*13   */ 'N': {O, O, O, O, I, I, O, I}, /* N / , */
+	/*14   */ 'O': {O, O, O, O, O, I, I, I}, /* O / 9 */
+	/*15   */ 'P': {O, O, O, I, I, O, I, I}, /* P / O */
+	/*16   */ 'Q': {O, O, I, I, I, O, I, I}, /* Q / 1  */
+	/*17   */ 'R': {O, O, O, I, O, I, O, I}, /* R / 4 */
+	/*18   */ 'S': {O, O, I, O, I, O, O, I}, /* S */
+	/*19   */ 'T': {O, O, O, O, O, O, I, I}, /* T / 5 */
+	/*20   */ 'U': {O, O, I, I, I, O, O, I}, /* U / 7 */
+	/*21   */ 'V': {O, O, O, I, I, I, I, I}, /* V / ; */
+	/*22   */ 'W': {O, O, I, I, O, O, I, I}, /* W / 2 */
+	/*23   */ 'X': {O, O, I, O, I, I, I, I}, /* X / / */
+	/*24   */ 'Y': {O, O, I, O, I, O, I, I}, /* Y / 6 */
+	/*25   */ 'Z': {O, O, I, O, O, O, I, I}, /* Z / " */
+	/*26*/ '\xfe': {O, O, O, O, O, O, I, I}, /* NULL */
+	/*27  */ '\n': {O, O, I, O, O, O, I, I}, /* LF/ LF */
+	/*28   */ ' ': {O, O, O, I, O, O, I, I}, /* SPACE / SPACE */
+	/*29  */ '\r': {O, O, O, O, I, O, I, I}, /* CR / CR */
+	/*30 */ '\x02': {O, I, I, O, I, I, I, I}, /* SHIFT_UP */
+	/*31 */ '\x01': {O, I, I, I, I, I, I, I}, /* SHIFT_DOWN */
+	/*32 */ '\x00': {O, O, O, O, O, O, O, O}, /* Open */
+	/*33 */ '\xff': {I, I, I, I, I, I, I, I}, /* closed */
+
+	// All entries here are FIGS; bit0 = 1
+	/* 0*/ '-': {I, O, I, I, O, O, O, I}, /*  A / - */
+	/* 1*/ '?': {I, O, I, O, O, I, I, I}, /*  B / ? */
+	/* 2*/ ':': {I, O, O, I, I, I, O, I}, /*  C / : */
+	/* 3*/ '$': {I, O, I, O, O, I, O, I}, /*  D / $ */
+	/* 4*/ '3': {I, O, I, O, O, O, O, I}, /*  E / 3 */
+	/* 5*/ // BEL or '
+	/* 6*/ '\a': {I, O, O, I, O, I, I, I}, /* G / BEL */
+	/* 7*/ // unknown
+	/* 8*/ '8': {I, O, O, I, I, O, O, I}, /*  I  / 8 */
+	/* 9*/ '\'': {I, O, I, I, O, I, O, I}, /* J  / ' */
+	/*10*/ '(': {I, O, I, I, I, I, O, I}, /*  K / ( */
+	/*11*/ ')': {I, O, O, I, O, O, I, I}, /*  L / ) */
+	/*12*/ '.': {I, O, O, O, I, I, I, I}, /*  M / . */
+	/*13*/ ',': {I, O, O, O, I, I, O, I}, /*  N / , */
+	/*14*/ '9': {I, O, O, O, O, I, I, I}, /*  O / 9 */
+	/*15*/ '0': {I, O, O, I, I, O, I, I}, /*  P / O */
+	/*16*/ '1': {I, O, I, I, I, O, I, I}, /*  Q / 1  */
+	/*17*/ '4': {I, O, O, I, O, I, O, I}, /*  R / 4 */
+	/*19*/ '5': {I, O, O, O, O, O, I, I}, /*  T / 5 */
+	/*20*/ '7': {I, O, I, I, I, O, O, I}, /*  U / 7 */
+	/*21*/ ';': {I, O, O, I, I, I, I, I}, /*  V / ; */
+	/*22*/ '2': {I, O, I, I, O, O, I, I}, /*  W / 2 */
+	/*23*/ '/': {I, O, I, O, I, I, I, I}, /*  X / / */
+	/*24*/ '6': {I, O, I, O, I, O, I, I}, /*  Y / 6 */
+	/*25*/ '"': {I, O, I, O, O, O, I, I}, /*  Z / " */
+	// These are duplicates for FIGURES
+	// /*26*/	'\xff': {I, O, O, O, O, O, I, I}, /* NULL */
+	// /*27*/  '\n': {I, O, I, O, O, O, I, I}, /* LF/ LF */
+	// /*28*/	' ': {I, O, O, I, O, O, I, I}, /* SPACE / SPACE */
+	// /*29*/	'\r': {I, O, O, O, I, O, I, I}, /* CR / CR */
+	// /*30*/	'\x01': {I, I, I, O, I, I, I, I}, /* SHIFT_UP */
+	// /*31*/	'\x00': {I, I, I, I, I, I, I, I}, /* SHIFT_DOWN */
+}
+
+var baudotChars = []baudotBits{
+	{O, I, I, O, O, O, I, I}, /* A */
+	{O, I, O, O, I, I, I, I}, /* B */
+	{O, O, I, I, I, O, I, I}, /* C */
+	{O, I, O, O, I, O, I, I}, /* D */
+	{O, I, O, O, O, O, I, I}, /* E / 3 */
+	{O, I, O, I, I, O, I, I}, /* F */
+	{O, O, I, O, I, I, I, I}, /* G */
+	{O, O, O, I, O, I, I, I}, /* H */
+	{O, O, I, I, O, O, I, I}, /* I  / 8 */
+	{O, I, I, O, I, O, I, I}, /* J */
+	{O, I, I, I, I, O, I, I}, /* K */
+	{O, O, I, O, O, I, I, I}, /* L */
+	{O, O, O, I, I, I, I, I}, /* M / . */
+	{O, O, O, I, I, O, I, I}, /* N */
+	{O, O, O, O, I, I, I, I}, /* O / 9 */
+	{O, O, I, I, O, I, I, I}, /* P / O */
+	{O, I, I, I, O, I, I, I}, /* Q / I  */
+	{O, O, I, O, I, O, I, I}, /* R / 4 */
+	{O, I, O, I, O, O, I, I}, /* S */
+	{O, O, O, O, O, I, I, I}, /* T / 5 */
+	{O, I, I, I, O, O, I, I}, /* U / 7 */
+	{O, O, I, I, I, I, I, I}, /* V */
+	{O, I, I, O, O, I, I, I}, /* W / 2 */
+	{O, I, O, I, I, I, I, I}, /* X / / */
+	{O, I, O, I, O, I, I, I}, /* Y / 6 */
+	{O, I, O, O, O, I, I, I}, /* Z */
+	{O, O, O, O, O, O, I, I}, /* NULL */
+	{O, O, I, O, O, O, I, I}, /* LF */
+	{O, O, O, I, O, O, I, I}, /* SPACE */
+	{O, O, O, O, I, O, I, I}, /* CR */
+	{O, I, I, O, I, I, I, I}, /* SHIFT_UP */
+	{O, I, I, I, I, I, I, I}, /* SHIFT_DOWN */
+	{O, O, O, O, O, O, O, O}, /* Open */
+	{I, I, I, I, I, I, I, I}, /* closed */
+}
+
 var ascii2Punctuation = map[rune]int{
 	'-':  CHAR_DASH,
 	'?':  CHAR_QUESTION,
@@ -103,46 +226,6 @@ var ascii2Characters = map[rune]int{
 	' ': CHAR_SPACE,
 }
 
-// Define _true so it is as long as "false" to keep below table aligned
-const _true = true
-
-var baudotChars = []baudotBits{
-	{false, _true, _true, false, false, false, _true, _true}, /* A */
-	{false, _true, false, false, _true, _true, _true, _true}, /* B */
-	{false, false, _true, _true, _true, false, _true, _true}, /* C */
-	{false, _true, false, false, _true, false, _true, _true}, /* D */
-	{false, _true, false, false, false, false, _true, _true}, /* E / 3 */
-	{false, _true, false, _true, _true, false, _true, _true}, /* F */
-	{false, false, _true, false, _true, _true, _true, _true}, /* G */
-	{false, false, false, _true, false, _true, _true, _true}, /* H */
-	{false, false, _true, _true, false, false, _true, _true}, /* I  / 8 */
-	{false, _true, _true, false, _true, false, _true, _true}, /* J */
-	{false, _true, _true, _true, _true, false, _true, _true}, /* K */
-	{false, false, _true, false, false, _true, _true, _true}, /* L */
-	{false, false, false, _true, _true, _true, _true, _true}, /* M / . */
-	{false, false, false, _true, _true, false, _true, _true}, /* N */
-	{false, false, false, false, _true, _true, _true, _true}, /* O / 9 */
-	{false, false, _true, _true, false, _true, _true, _true}, /* P / false */
-	{false, _true, _true, _true, false, _true, _true, _true}, /* Q / _true  */
-	{false, false, _true, false, _true, false, _true, _true}, /* R / 4 */
-	{false, _true, false, _true, false, false, _true, _true}, /* S */
-	{false, false, false, false, false, _true, _true, _true}, /* T / 5 */
-	{false, _true, _true, _true, false, false, _true, _true}, /* U / 7 */
-	{false, false, _true, _true, _true, _true, _true, _true}, /* V */
-	{false, _true, _true, false, false, _true, _true, _true}, /* W / 2 */
-	{false, _true, false, _true, _true, _true, _true, _true}, /* X / / */
-	{false, _true, false, _true, false, _true, _true, _true}, /* Y / 6 */
-	{false, _true, false, false, false, _true, _true, _true}, /* Z */
-	{false, false, false, false, false, false, _true, _true}, /* NULL */
-	{false, false, _true, false, false, false, _true, _true}, /* LF */
-	{false, false, false, _true, false, false, _true, _true}, /* SPACE */
-	{false, false, false, false, _true, false, _true, _true}, /* CR */
-	{false, _true, _true, false, _true, _true, _true, _true}, /* SHIFT_UP */
-	{false, _true, _true, _true, _true, _true, _true, _true}, /* SHIFT_DOWN */
-	{false, false, false, false, false, false, false, false}, /* Open */
-	{_true, _true, _true, _true, _true, _true, _true, _true}, /* closed */
-}
-
 // Convert input character to intermediate Baudot representation, a
 // numeric value in the rate 0-31.
 func intValues(v rune, c *convert) ([]int, bool) {
@@ -179,11 +262,55 @@ func intValues(v rune, c *convert) ([]int, bool) {
 	return retValues, true
 }
 
+func asciiToBaudotNext(r rune, c *convert) ([]baudotBits, bool) {
+	var retBits = make([]baudotBits, 0, 16)
+
+	// Deal with control characters first
+	switch r {
+	case lineFeed, carriageReturn:
+		retBits = append(retBits, baudotConv[carriageReturn])
+		retBits = append(retBits, baudotConv[lineFeed])
+		return append(retBits, baudotConv[shiftDown]), true
+	case spaceCharacter:
+		return append(retBits, baudotConv[spaceCharacter]), true
+	}
+
+	// Get raw Baudot value
+	bits, ok := baudotConv[r]
+	if !ok {
+		return nil, false
+	}
+
+	shift := bits[0]
+	if shift != c.shift {
+		c.shift = shift
+		if shift {
+			retBits = append(retBits, baudotConv[shiftUp])
+		} else {
+			retBits = append(retBits, baudotConv[shiftDown])
+		}
+		retBits = append(retBits, bits)
+	} else {
+		return append(retBits, bits), true
+	}
+	return nil, false
+}
+
 func asciiToBaudot(v int) baudotBits {
 	if v > len(baudotChars) {
 		return baudotChars[CHAR_CLOSED]
 	}
 	return baudotChars[v]
+}
+
+func writeBitsNext(bitsSlice []baudotBits) {
+	for _, bits := range bitsSlice {
+		for _, bit := range bits[1:] {
+			wp.WriteBit(bit)
+			wp.DelayMicroseconds(BAUD_DELAY_45)
+		}
+		wp.DelayMicroseconds(BAUD_DELAY_45 / 2)
+	}
 }
 
 func writeBits(bits baudotBits) {
@@ -203,9 +330,25 @@ func printRune(r rune, c *convert) {
 	}
 }
 
+func printRuneNext(r rune, c *convert) {
+	bitsSlice, ok := asciiToBaudotNext(r, c)
+	if !ok {
+		return
+	}
+	writeBitsNext(bitsSlice)
+}
+
 func printRaw(val int, c *convert) {
 	bits := asciiToBaudot(val)
 	writeBits(bits)
+}
+
+func printRawNext(r rune, c *convert) {
+	bits, ok := asciiToBaudotNext(r, c)
+	if !ok {
+		return
+	}
+	writeBitsNext(bits)
 }
 
 func initializeTeletype(c *convert) {
@@ -215,4 +358,12 @@ func initializeTeletype(c *convert) {
 	printRaw(CHAR_SHIFT_DOWN, c)
 	printRaw(CHAR_CR, c)
 	printRaw(CHAR_LF, c)
+}
+
+func initializeTeletypeNext(c *convert) {
+	printRawNext(nullChar, c)
+	printRawNext(nullChar, c)
+	printRawNext(shiftDown, c)
+	printRawNext(carriageReturn, c)
+	printRawNext(lineFeed, c)
 }

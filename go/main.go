@@ -9,10 +9,10 @@ func main() {
 		"ryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryry"
 
 	baudot := baudot.New()
-	baudot.Print(test)
-	baudot.Print(test)
-	baudot.Print(test)
-	baudot.Print(test)
-	baudot.Print(test)
-	baudot.Print("\n\n")
+	baudot.PrintNext(test)
+	baudot.PrintNext(test)
+	baudot.PrintNext(test)
+	baudot.PrintNext(test)
+	baudot.PrintNext(test)
+	baudot.PrintNext("\n\n")
 }
