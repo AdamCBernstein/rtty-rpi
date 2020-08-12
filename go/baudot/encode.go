@@ -1,16 +1,26 @@
 package baudot
 
 import (
-	"rtty/gpio"
+	"fmt"
 	"unicode"
+
+	"rtty/gpio"
 )
 
 type baudotBits [8]bool
-type convert struct {
+type Convert struct {
 	shift bool
 }
 
-func asciiToBaudot(r rune, c *convert) ([]baudotBits, bool) {
+func shiftLettersFigures(shift bool, c *Convert, retBits []baudotBits) []baudotBits {
+	if shift {
+		return append(retBits, baudotConv[shiftUp])
+	} else {
+		return append(retBits, baudotConv[shiftDown])
+	}
+}
+
+func asciiToBaudot(r rune, c *Convert) ([]baudotBits, bool) {
 	var retBits = make([]baudotBits, 0, 8)
 
 	// Deal with control characters first
@@ -32,23 +42,21 @@ func asciiToBaudot(r rune, c *convert) ([]baudotBits, bool) {
 		return nil, false
 	}
 
-	shift := bits[LTRS_FIGS_BIT]
-	if shift != c.shift {
+	if shift := bits[LTRS_FIGS_BIT]; shift != c.shift {
 		c.shift = shift
-		if shift {
-			retBits = append(retBits, baudotConv[shiftUp])
-		} else {
-			retBits = append(retBits, baudotConv[shiftDown])
-		}
+		retBits = shiftLettersFigures(c.shift, c, retBits)
 	}
 	return append(retBits, bits), true
 }
 
-func printRune(r rune, c *convert) {
+func printRune(r rune, c *Convert) {
 	bitsSlice, ok := asciiToBaudot(unicode.ToUpper(r), c)
 	if !ok {
 		return
 	}
+
+	// Give some console feedback. TODO: Make callback function
+	fmt.Printf("%c", r)
 	writeBits(bitsSlice)
 }
 
@@ -62,7 +70,7 @@ func writeBits(bitsChar []baudotBits) {
 	}
 }
 
-func initializeTeletype(c *convert) {
+func initializeTeletype(c *Convert) {
 	printRune(shiftDown, c)
 	printRune(shiftDown, c)
 	printRune(carriageReturn, c)

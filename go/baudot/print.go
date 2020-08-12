@@ -4,14 +4,14 @@ import (
 	"rtty/gpio"
 )
 
-func New() *convert {
+func New() *Convert {
 	wiringpi.Initialize(wiringpi.GPIO_PIN0)
-	c := &convert{shift: false}
+	c := &Convert{shift: false}
 	initializeTeletype(c)
 	return c
 }
 
-func (c *convert) Print(line string) {
+func (c *Convert) Print(line string) {
 	column := 0
 	for _, char := range line {
 		printRune(char, c)
