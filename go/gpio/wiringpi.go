@@ -27,4 +27,5 @@ func WriteBit(bit bool) {
 
 func DelayMicroseconds(delay uint) {
 	C.delayMicroseconds(C.uint(delay))
+
 }

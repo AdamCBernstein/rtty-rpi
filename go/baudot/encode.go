@@ -1,7 +1,7 @@
 package baudot
 
 import (
-	wp "rtty/gpio"
+	"rtty/gpio"
 	"unicode"
 )
 
@@ -16,14 +16,14 @@ func asciiToBaudot(r rune, c *convert) ([]baudotBits, bool) {
 	// Deal with control characters first
 	switch r {
 	case lineFeed, carriageReturn:
-		retBits = append(retBits, baudotConv[carriageReturn])
-		retBits = append(retBits, baudotConv[lineFeed])
-		retBits = append(retBits, baudotConv[shiftDown])
 		c.shift = false
-		return retBits, true
-	case spaceCharacter:
-		retBits = append(retBits, baudotConv[spaceCharacter])
-		return retBits, true
+		return append(retBits,
+			baudotConv[carriageReturn],
+			baudotConv[lineFeed],
+			baudotConv[shiftDown]), true
+
+	case spaceChar:
+		return append(retBits, baudotConv[spaceChar]), true
 	}
 
 	// Get Baudot bits value for ASCII character
@@ -55,10 +55,10 @@ func printRune(r rune, c *convert) {
 func writeBits(bitsChar []baudotBits) {
 	for _, bits := range bitsChar {
 		for _, bit := range bits[:LTRS_FIGS_BIT] {
-			wp.WriteBit(bit)
-			wp.DelayMicroseconds(BAUD_DELAY_45)
+			wiringpi.WriteBit(bit)
+			wiringpi.DelayMicroseconds(BAUD_DELAY_45)
 		}
-		wp.DelayMicroseconds((BAUD_DELAY_45 * 50) / 100)
+		wiringpi.DelayMicroseconds((BAUD_DELAY_45 * 50) / 100)
 	}
 }
 
