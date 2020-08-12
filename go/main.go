@@ -8,7 +8,7 @@ import (
 )
 
 func printTest(baudot *baudot.Convert) {
-	spaces := "SpaceTest:                                                        "
+	spaces := "SpaceTest:B         !         !         !         !         !    E"
 	I0 := "Z0Y1X2W3V4U5T6S7R8P9Q0Z0Y1X2W3V4U5T6S7R8P9Q0Z0Y1X2W3V4U5T6S7R8P9Q0"
 	test := "the quick brown fox jumped over the lazy dog's back     1234567890\n" +
 		"ryryryryryryryryryryryryryryryryryryryryrryyryryryryryryryryryryry\n" +
@@ -16,7 +16,7 @@ func printTest(baudot *baudot.Convert) {
 
 	baudot.Print(spaces)
 	baudot.Print(I0)
-	baudot.Print("\n")
+	baudot.Print("")
 	baudot.Print(test)
 	baudot.Print(test)
 	baudot.Print(test)

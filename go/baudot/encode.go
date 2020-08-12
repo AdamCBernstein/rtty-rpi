@@ -50,13 +50,14 @@ func asciiToBaudot(r rune, c *Convert) ([]baudotBits, bool) {
 }
 
 func printRune(r rune, c *Convert) {
-	bitsSlice, ok := asciiToBaudot(unicode.ToUpper(r), c)
+	rUpper := unicode.ToUpper(r)
+	bitsSlice, ok := asciiToBaudot(rUpper, c)
 	if !ok {
 		return
 	}
 
 	// Give some console feedback. TODO: Make callback function
-	fmt.Printf("%c", r)
+	fmt.Printf("%c", rUpper)
 	writeBits(bitsSlice)
 }
 
