@@ -10,7 +10,7 @@ func New() *convert {
 	time.Sleep(time.Second)
 
 	c := &convert{
-		baudotTable: baudotChars,
+		shift: false,
 	}
 	initializeTeletype(c)
 
@@ -18,23 +18,6 @@ func New() *convert {
 }
 
 func (c *convert) Print(line string) {
-	i := 0
-	for _, char := range line {
-		printRune(char, c)
-		i++
-
-		if i > COLUMN_MAX {
-			printRune('\n', c)
-			i = 0
-		}
-		if char == '\n' {
-			i = 0
-		}
-	}
-	printRune('\n', c)
-}
-
-func (c *convert) PrintNext(line string) {
 	i := 0
 	for _, char := range line {
 		printRune(char, c)
