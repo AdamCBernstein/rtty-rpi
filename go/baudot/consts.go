@@ -19,6 +19,7 @@ const (
 	bellChar       = '\a'
 	lineFeed       = '\n'
 	carriageReturn = '\r'
+	tabChar        = '\t'
 	spaceChar      = ' '
 	nullChar       = '\xfe'
 )
@@ -30,7 +31,7 @@ const (
 	LTRS_FIGS_BIT = 7
 )
 
-// Define I ("one"; true), O ("zero"; false) to populate Buadot
+// Define I ("one"; true), O ("zero"; false) to populate Baudot
 // code table below. Makes reading the bool values (bits) easier.
 // These are the letters 'I' and 'O', respectively
 const I = true
@@ -88,25 +89,24 @@ var baudotConv = map[rune]baudotBits{
 	'3':      {O, I, O, O, O, O, I, I}, // E / 3
 	'!':      {O, I, O, I, I, O, I, I}, // F / !
 	bellChar: {O, O, I, O, I, I, I, I}, // G / BELL
-	//        UNKNOWN {O, O, O, I, O, I, I, I}, // H
-	'8':  {O, O, I, I, O, O, I, I}, // I  / 8
-	'\'': {O, I, I, O, I, O, I, I}, // J / '
-	'(':  {O, I, I, I, I, O, I, I}, // K / (
-	')':  {O, O, I, O, O, I, I, I}, // L / )
-	'.':  {O, O, O, I, I, I, I, I}, // M / .
-	',':  {O, O, O, I, I, O, I, I}, // N / ,
-	'9':  {O, O, O, O, I, I, I, I}, // 0  / 9
-	'0':  {O, O, I, I, O, I, I, I}, // P / O
-	'1':  {O, I, I, I, O, I, I, I}, // Q / 1
-	'4':  {O, O, I, O, I, O, I, I}, // R / 4
-	// ALT-BEL  {O, I, O, I, O, O, I, I}, // S
-	'5': {O, O, O, O, O, I, I, I}, // T / 5
-	'7': {O, I, I, I, O, O, I, I}, // U / 7
-	';': {O, O, I, I, I, I, I, I}, // V / (
-	'2': {O, I, I, O, O, I, I, I}, // W / 2
-	'/': {O, I, O, I, I, I, I, I}, // X / /
-	'6': {O, I, O, I, O, I, I, I}, // Y / 6
-	'"': {O, I, O, O, O, I, I, I}, // Z / "
+	'8':      {O, O, I, I, O, O, I, I}, // I  / 8
+	'\'':     {O, I, I, O, I, O, I, I}, // J / '
+	'(':      {O, I, I, I, I, O, I, I}, // K / (
+	')':      {O, O, I, O, O, I, I, I}, // L / )
+	'.':      {O, O, O, I, I, I, I, I}, // M / .
+	',':      {O, O, O, I, I, O, I, I}, // N / ,
+	'9':      {O, O, O, O, I, I, I, I}, // 0  / 9
+	'0':      {O, O, I, I, O, I, I, I}, // P / O
+	'1':      {O, I, I, I, O, I, I, I}, // Q / 1
+	'4':      {O, O, I, O, I, O, I, I}, // R / 4
+	tabChar:  {O, I, O, I, O, O, I, I}, // S
+	'5':      {O, O, O, O, O, I, I, I}, // T / 5
+	'7':      {O, I, I, I, O, O, I, I}, // U / 7
+	';':      {O, O, I, I, I, I, I, I}, // V / (
+	'2':      {O, I, I, O, O, I, I, I}, // W / 2
+	'/':      {O, I, O, I, I, I, I, I}, // X / /
+	'6':      {O, I, O, I, O, I, I, I}, // Y / 6
+	'"':      {O, I, O, O, O, I, I, I}, // Z / "
 	// What does upper case control characters even mean?
 	//      nullChar: {O, O, O, O, O, O, I, I}, // NULL
 	//      lineFeed: {O, O, I, O, O, O, I, I}, // LF
