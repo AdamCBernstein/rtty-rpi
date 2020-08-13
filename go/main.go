@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"rtty/baudot"
@@ -10,7 +11,10 @@ func main() {
 	// Print named file, if one is provided. Otherwise, print test
 	b := baudot.New()
 	if len(os.Args) > 1 {
-		b.PrintFile(os.Args[1])
+		if err := b.PrintFile(os.Args[1]); err != nil {
+			fmt.Printf("Cannot print file %q: %v\n", os.Args[1], err)
+			os.Exit(1)
+		}
 	} else {
 		printTest(b)
 	}
