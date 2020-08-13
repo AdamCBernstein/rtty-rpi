@@ -1,29 +1,80 @@
 package baudot
 
 import (
-	"rtty/gpio"
+	"bufio"
+	"fmt"
+	"os"
+	"unicode"
 )
 
-func New() *Convert {
-	wiringpi.Initialize(wiringpi.GPIO_PIN0)
-	c := &Convert{shift: false}
-	initializeTeletype(c)
-	return c
+func (c *Convert) initializeTeletype() {
+	c.printRune(shiftDown)
+	c.printRune(shiftDown)
+	c.printRune(carriageReturn)
+	c.printRune(lineFeed)
+	c.printRune(shiftDown)
 }
 
-func (c *Convert) Print(line string) {
+func (c *Convert) PrintLine(line string) {
 	column := 0
 	for _, char := range line {
-		printRune(char, c)
+		c.printRune(char)
 		column++
 
 		if column > COLUMN_MAX {
-			printRune('\n', c)
+			c.printRune('\n')
 			column = 0
 		}
 		if char == '\n' {
 			column = 0
 		}
 	}
-	printRune('\n', c)
+	c.printRune('\n')
+}
+
+func (c *Convert) PrintRune(r rune) {
+	c.printRune(r)
+}
+
+func (c *Convert) printRune(r rune) {
+	rUpper := unicode.ToUpper(r)
+	bitsSlice, ok := c.asciiToBaudot(rUpper)
+	if !ok {
+		return
+	}
+
+	// Give some console feedback. TODO: Make callback function
+	fmt.Printf("%c", rUpper)
+	c.WriteBits(bitsSlice)
+}
+
+func (c *Convert) PrintFile(fname string) error {
+	if fp, err := os.Open(fname); err != nil {
+		return err
+	} else {
+		defer fp.Close()
+
+		scan := bufio.NewScanner(fp)
+		for scan.Scan() {
+			c.PrintLine(scan.Text())
+		}
+	}
+	return nil
+}
+
+func (c *Convert) PrintTest() {
+	spaces := "SpaceTest:B         1         2         3         4         5    E"
+	I0 := "Z0Y1X2W3V4U5T6S7R8P9Q0Z0Y1X2W3V4U5T6S7R8P9Q0Z0Y1X2W3V4U5T6S7R8P9Q0"
+	test := "the quick brown fox jumped over the lazy dog's back     1234567890\n" +
+		"ryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryry\n" +
+		"sgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsg"
+
+	c.PrintLine(spaces)
+	c.PrintLine(I0)
+	c.PrintLine("")
+	c.PrintLine(test)
+	c.PrintLine(test)
+	c.PrintLine(test)
+	c.PrintLine(test)
+	c.PrintLine("\n\n")
 }
