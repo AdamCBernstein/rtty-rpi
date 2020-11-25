@@ -17,14 +17,14 @@ type Convert struct {
 	pin             rpio.Pin
 }
 
-func New() *Convert {
+func New(speed int) (*Convert, error) {
 	if err := rpio.Open(); err != nil {
-		return nil
+		return nil, err
 	}
 	pinGpio.Output()
-	c := &Convert{bitTimeDuration: BAUD_DELAY_45, shift: false, pin: pinGpio}
+	c := &Convert{bitTimeDuration: time.Duration(speed), shift: false, pin: pinGpio}
 	c.initializeTeletype()
-	return c
+	return c, nil
 }
 
 func (c *Convert) WriteBits(bitsChar []baudotBits) {

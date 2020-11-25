@@ -1,8 +1,8 @@
-CFLAGS = -I/usr/local/include -I. -g -Wall
+CFLAGS = -I/usr/local/include -I. -g -Wall -DNO_XCASE 
 all: rtty-pi
 
-rtty-pi: hack-pi.o
-	cc -o rtty-pi hack-pi.o -L/usr/local/lib -lwiringPi
+rtty-pi: hack-pi.o wiringPi.o
+	cc -o rtty-pi hack-pi.o wiringPi.o
 hack-pi.o: wiringPi.h
 clean: 
-	rm -f hack-pi.o rtty-pi
+	rm -f hack-pi.o wiringPi.o rtty-pi

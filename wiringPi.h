@@ -6,9 +6,9 @@
 #define OUTPUT 0
 
 int wiringPiSetup(void);
-int pinMode(int, int);
-int digitalWrite(int, int);
-int delay(int);
+void pinMode(int, int);
+void digitalWrite(int, int);
+void delay(int);
 
 
 #endif

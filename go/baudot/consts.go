@@ -4,6 +4,7 @@ package baudot
 const (
 	BAUD_DELAY_45 = 22000 // 22ms = 45 baud, 60WPM; in uSeconds
 	BAUD_DELAY_50 = 20000 // 20ms = 50 baud, 66WPM; in uSeconds
+	BAUD_DELAY_57 = 18000 // 18ms = 56.9 baud, 75WPM; in uSeconds
 	BAUD_DELAY_74 = 13470 // 13ms = 74 baud, 100WPM; in uSeconds
 )
 

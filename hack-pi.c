@@ -14,9 +14,10 @@
 
 int g_stop;
 
-#define BAUD_DELAY_45 22000    /* 22ms = 45 baud, 60WPM */
-#define BAUD_DELAY_50 20000    /* 20ms = 50 baud, 66WPM */
-#define BAUD_DELAY_74 13470    /* 13ms = 74 baud, 100WPM */
+#define BAUD_DELAY_45 22000    /* 22ms = 45 baud, 60WPM    */
+#define BAUD_DELAY_50 20000    /* 20ms = 50 baud, 66WPM    */
+#define BAUD_DELAY_57 18000    /* 18ms = 56.9 baud, 75WPM  */
+#define BAUD_DELAY_74 13470    /* 13ms = 74 baud, 100WPM   */
 #define COLUMN_MAX 76
 
 #define CHAR_A          0
@@ -100,6 +101,9 @@ void rtty_conf_init(rtty_conf *ctx)
         break;
       case 66:
         ctx->bit_delay = BAUD_DELAY_50;
+        break;
+      case 75:
+        ctx->bit_delay = BAUD_DELAY_57;
         break;
       case 100:
         ctx->bit_delay = BAUD_DELAY_74;
@@ -669,7 +673,11 @@ int set_raw(int fd, struct termios *old_mode)
 
     mode.c_iflag     = 0;
     mode.c_oflag    &= ~OPOST;
+#ifdef NO_XCASE
+    mode.c_lflag    &= ~(IEXTEN | ISIG | ICANON | ECHO);
+#else
     mode.c_lflag    &= ~(IEXTEN | ISIG | ICANON | ECHO | XCASE);
+#endif
     mode.c_cflag    &= ~(CSIZE | PARENB);
     mode.c_cflag    |= CS8;
     mode.c_cc[VMIN]  = 1;

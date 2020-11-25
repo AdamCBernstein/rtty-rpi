@@ -8,8 +8,17 @@ import (
 )
 
 func main() {
+	baudRate := baudot.BAUD_DELAY_45
+
 	// Print named file, if one is provided. Otherwise, print test
-	b := baudot.New()
+	b, err := baudot.New(baudRate)
+	if err != nil {
+		fmt.Printf("%s: unable to create a New() context: %v\n", os.Args[0], err)
+		os.Exit(1)
+	}
+
+	// TODO: Add command line parsing to deal with options, like speed,
+	// print test, etc...
 	if len(os.Args) > 1 {
 		if err := b.PrintFile(os.Args[1]); err != nil {
 			fmt.Printf("Cannot print file %q: %v\n", os.Args[1], err)
