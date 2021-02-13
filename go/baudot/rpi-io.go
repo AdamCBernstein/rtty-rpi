@@ -52,6 +52,12 @@ type Convert struct {
 	motor           rpio.Pin
 }
 
+func (c *Convert) Close() {
+	time.Sleep(time.Second * 3)
+	c.MotorControl(false)
+	rpio.Close()
+}
+
 func New(speed int) (*Convert, error) {
 	if err := rpio.Open(); err != nil {
 		return nil, err
@@ -62,6 +68,12 @@ func New(speed int) (*Convert, error) {
 		motor: rpio.Pin(GPIO1)}
 	c.pin.Output()
 	c.motor.Output()
+
+	// Turn on Teletype motor, then pause briefly, then
+	// initialize the Teletype's mechanical state.
+	c.MotorControl(true)
+	time.Sleep(time.Second * 3)
+
 	c.initializeTeletype()
 	return c, nil
 }
