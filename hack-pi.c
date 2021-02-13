@@ -20,6 +20,9 @@ int g_stop;
 #define BAUD_DELAY_74 13470    /* 13ms = 74 baud, 100WPM   */
 #define COLUMN_MAX 76
 
+#define GPIO_PIN_0 0
+#define GPIO_PIN_1 1
+
 #define CHAR_A          0
 #define CHAR_Z          25
 #define CHAR_NULL       26
@@ -69,6 +72,8 @@ typedef struct rtty_conf
     int sec_sleep;
     int milli_sleep;
     int no_init;
+    int gpio_pin_data;
+    int gpio_pin_motor;
 } rtty_conf;
 
 void encode_bit(rtty_conf *ctx, int c);
@@ -82,6 +87,7 @@ void print_line(rtty_conf *ctx, char *line);
 void print_file(rtty_conf *ctx, char *name);
 int set_raw(int fd, struct termios *old_mode);
 void keyboard_io(rtty_conf *ctx);
+void tty_motor_control(rtty_conf *ctx, int state);
 
 void interrupt_function(int sig)
 {
@@ -94,6 +100,15 @@ void interrupt_function(int sig)
 void rtty_conf_init(rtty_conf *ctx)
 {
     ctx->bits = 8;
+    ctx->gpio_pin_data = GPIO_PIN_0;
+    ctx->gpio_pin_motor = GPIO_PIN_1;
+
+    /* Sanity check default values */
+    if (ctx->wpm == 0)
+    {
+        ctx->wpm = 60;
+    }
+
     switch (ctx->wpm)
     {
       case 60:
@@ -125,7 +140,7 @@ Usage(void) {
             "     --input-file IN_FILE\n"
             "     --test-data [N]; default N=1\n"
             "     --keyboard\n"
-            "     --wpm 60 | 66 | 100\n"
+            "     --wpm 60 | 66 | 75 | 100\n"
             "     --char-delay sec\n"
             "     --no-init\n"
             );
@@ -204,7 +219,7 @@ int main(int argc, char **argv)
         }
         else if (!strcmp(argv[i], "--no-init")) {
             ctx.no_init = 1;
-	}
+        }
         else if (!strcmp(argv[i], "--char-delay")) {
             char *b;
             char *e;
@@ -248,9 +263,13 @@ int main(int argc, char **argv)
     signal(SIGINT, interrupt_function);
 
     if (test_data) {
+        tty_motor_control(&ctx, 1);
         test_generator(&ctx);
+        tty_motor_control(&ctx, 0);
     }
     else {
+        tty_motor_control(&ctx, 1);
+
         pause_print(&ctx, 10);
         initialize_tty(&ctx);
 
@@ -269,6 +288,8 @@ int main(int argc, char **argv)
 
         initialize_tty(&ctx);
         pause_print(&ctx, 10);
+
+        tty_motor_control(&ctx, 0);
     }
     return 0;
 }
@@ -391,6 +412,14 @@ void pause_print(rtty_conf *ctx, int count)
 }
 
 
+void delay_operation(rtty_conf *ctx)
+{
+    if (ctx->sec_sleep > 0 || ctx->milli_sleep > 0) {
+        sleep(ctx->sec_sleep);
+        usleep(ctx->milli_sleep * 1000);
+    }
+}
+
 void print_char(rtty_conf *ctx, char c)
 {
     char baudot[16];
@@ -434,10 +463,12 @@ void print_char(rtty_conf *ctx, char c)
         printf("\r\n");
         ctx->column = 0;
     }
+/*
     if (ctx->sec_sleep > 0 || ctx->milli_sleep > 0) {
         sleep(ctx->sec_sleep);
         usleep(ctx->milli_sleep * 1000);
     }
+*/
 }
 
 
@@ -580,6 +611,7 @@ ascii_2_baudot(char c, char *baudot, int *shift)
 void
 encode_to_baudot(rtty_conf *ctx, char c)
 {
+    /* Convert ASCII -> Baudot, then write those bits to GPIO interface */
     static char baudot_bits[][8] = {
         {0, 1, 1, 0, 0, 0, 1, 1}, /* A */
         {0, 1, 0, 0, 1, 1, 1, 1}, /* B */
@@ -618,30 +650,60 @@ encode_to_baudot(rtty_conf *ctx, char c)
     };
     int i = (int) c;
 
+    /* Write each BAUDOT bit to GPIO interface */
     if (i>=0 && i<(sizeof(baudot_bits)/8)) {
        encode_bits(ctx, baudot_bits[i], 8);
     }
+    delay_operation(ctx);
 }
 
 void encode_bits(rtty_conf *ctx, char *bits, int len)
 {
     int i;
 
+    /* Walk through all Baudot bits, writing them to GPIO pin */
     for (i=0; i < len; i++) {
         encode_bit(ctx, bits[i]);
     }
 }
 
 void
+tty_motor_control(rtty_conf *ctx, int state)
+{
+    /* Wait a little, so last Teletype operation is "done" */
+    sleep(1);
+
+    /* Turn the Teletype motor on or off */
+    if (state) {
+        digitalWrite(ctx->gpio_pin_motor, HIGH); 
+
+        /* Give the Teletype motor 2 seconds to spin up */
+        sleep(2);
+    }
+    else
+    {
+        digitalWrite(ctx->gpio_pin_motor, LOW); 
+
+        /* To prevent "motor thrashing" wait 10s  for the motor to completely stop */
+        sleep(10);
+    }
+}
+
+void
 encode_bit(rtty_conf *ctx, int c) 
 {
+    /*
+     * Baudot bits are written to GPIO output here. Write the 1 / 0 value to
+     * the GPIO interface, then delay the "bit width" in time". This is
+     * a serial port interface written in software
+     */
     switch(c) {
     case 0:
-        digitalWrite(0, HIGH); 
+        digitalWrite(ctx->gpio_pin_data, HIGH); 
         delay_usec(ctx->bit_delay);
         break;
     case 1:
-        digitalWrite(0, LOW); 
+        digitalWrite(ctx->gpio_pin_data, LOW); 
         delay_usec(ctx->bit_delay);
         break;
     }
