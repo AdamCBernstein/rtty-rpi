@@ -9,6 +9,7 @@ func (c *Convert) asciiToBaudot(r rune) ([]baudotBits, bool) {
 	switch r {
 	case carriageReturn, lineFeed:
 		// Force downshift on CR/LF to keep Teletype shift state in-sync
+		c.shift = false
 		return append(retBits,
 			baudotConv[carriageReturn],
 			baudotConv[lineFeed],
