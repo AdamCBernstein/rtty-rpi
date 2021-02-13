@@ -19,6 +19,7 @@ func main() {
 
 	// TODO: Add command line parsing to deal with options, like speed,
 	// print test, etc...
+	b.MotorControl(true)
 	if len(os.Args) > 1 {
 		if err := b.PrintFile(os.Args[1]); err != nil {
 			fmt.Printf("Cannot print file %q: %v\n", os.Args[1], err)
@@ -27,6 +28,7 @@ func main() {
 	} else {
 		printTest(b)
 	}
+	b.MotorControl(false)
 }
 
 func printTest(c *baudot.Convert) {

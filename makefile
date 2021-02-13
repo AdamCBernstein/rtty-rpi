@@ -1,5 +1,5 @@
 CFLAGS = -I/usr/local/include -Wall -g
-all: rtty-pi
+all: rtty-pi go/rtty
 
 rtty-pi: hack-pi.o 
 	cc -o rtty-pi hack-pi.o -L/usr/local/lib -lwiringPi
@@ -9,5 +9,9 @@ blink: blink.o
 	cc -o blink blink.o -L/usr/local/lib -lwiringPi
 	sudo chown root blink
 	sudo chmod 4755 blink
+
+go/rtty: go/baudot/print.go go/baudot/encode.go go/baudot/consts.go go/baudot/rpi-io.go go/main.go
+	cd go; go build; sudo chown root rtty; sudo chmod 4755 rtty
+
 clean: 
-	rm -f hack-pi.o rtty-pi blink.o blink
+	rm -f hack-pi.o rtty-pi blink.o blink go/rtty
