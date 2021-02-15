@@ -9,6 +9,16 @@ LOG="/tmp/nws-teletype.log"
 # This is script is dependent this project
 #    https://github.com/AdamCBernstein/nws-http
 
+if [ ! -d "/var/tmp/nws" ]; then
+  mkdir "/var/tmp/nws"
+fi
+
+if [ -L "/var/tmp/nws.lock" ]; then
+  echo "$(date) $0 is already running; 	quitting." >> "$LOG"
+  exit 0
+fi
+ln -s "/var/tmp/nws" "/var/tmp/nws.lock"
+
 file1=/var/tmp/nws/sew.txt
 file2=/var/tmp/nws/sew2.txt
 file_print=$file1
@@ -30,7 +40,8 @@ fi
 
 if [ $print -eq 1 ]; then
   echo "$(date) rtty $file_print" >> "$LOG"
-  nice 0 rtty "$file_print" > /dev/null 2>&1
+  nice -n 0 rtty "$file_print" > /dev/null 2>&1
 else
   echo "$(date) '$file_print' has not changed" >> "$LOG"
 fi
+rm -f "/var/tmp/nws.lock"
