@@ -1,7 +1,8 @@
 UNAME := $(shell uname)
 
+# Determin platform type. Looking for Rpi-like platform
 platform:
-ifeq ("$(UNAME)", "Darwin")
+ifeq ("$(arch)", "armv6l")
 	make -f makefile.nopi
 else
 	make -f makefile.arm
