@@ -1,11 +1,11 @@
-UNAME := $(shell uname)
-
 # Determin platform type. Looking for Rpi-like platform
 platform:
-ifeq ("$(arch)", "armv6l")
-	make -f makefile.nopi
-else
+ifeq ("$(shell arch)", "armv6l")
+	echo makefile.arm
 	make -f makefile.arm
+else
+	echo makefile.nopi
+	make -f makefile.nopi
 endif
 
 all:
