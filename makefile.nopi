@@ -1,8 +1,14 @@
 CFLAGS = -I/usr/local/include -I. -g -Wall -DNO_XCASE 
-all: rtty-pi
+
+all: rtty-pi go/rtty
 
 rtty-pi: hack-pi.o wiringPi.o
 	cc -o rtty-pi hack-pi.o wiringPi.o
+
 hack-pi.o: wiringPi.h
+
 clean: 
-	rm -f hack-pi.o wiringPi.o rtty-pi
+	rm -f hack-pi.o wiringPi.o rtty-pi blink.o blink go/rtty
+
+go/rtty: go/baudot/print.go go/baudot/test.go go/baudot/encode.go go/baudot/consts.go go/baudot/rpi-io.go go/main.go
+	cd go && go fmt ./... &&  go build &&  sudo chown root rtty && sudo chmod 4755 rtty

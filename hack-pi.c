@@ -130,6 +130,7 @@ void rtty_conf_init(rtty_conf *ctx)
 
     wiringPiSetup ();
     pinMode (0, OUTPUT);
+    pinMode (1, OUTPUT);
 } 
 
 void
