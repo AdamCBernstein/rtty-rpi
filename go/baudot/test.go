@@ -1,5 +1,9 @@
 package baudot
 
+import (
+	"fmt"
+)
+
 func (c *Convert) PrintTest() {
 	const (
 		spaces   = "SpaceTest:B         1         2         3         4         5    E"
@@ -9,6 +13,9 @@ func (c *Convert) PrintTest() {
 			"ryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryry\n" +
 			"sgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsg"
 	)
+	len, err := c.Write([]byte(spaces))
+	fmt.Printf("%d %v\n", len, err)
+	fmt.Fprintf(c, "Hello World %s", "from Adam")
 
 	c.PrintLine(spaces)
 	c.PrintLine(puncts)

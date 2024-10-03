@@ -15,6 +15,11 @@ func (c *Convert) initializeTeletype() {
 	c.printRune(shiftDown)
 }
 
+func (c *Convert) Write(line []byte) (n int, err error) {
+	c.PrintLine(string(line))
+	return len(line), nil
+}
+
 func (c *Convert) PrintLine(line string) {
 	column := 0
 	for _, char := range line {
