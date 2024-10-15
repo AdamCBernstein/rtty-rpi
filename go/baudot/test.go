@@ -13,17 +13,14 @@ func (c *Convert) PrintTest() {
 			"ryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryryry\n" +
 			"sgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsgsg"
 	)
-	len, err := c.Write([]byte(spaces))
-	fmt.Printf("%d %v\n", len, err)
-	fmt.Fprintf(c, "Hello World %s", "from Adam")
 
-	c.PrintLine(spaces)
-	c.PrintLine(puncts)
-	c.PrintLine(figsLtrs)
-	c.PrintLine("")
-	c.PrintLine(test)
-	c.PrintLine(test)
-	c.PrintLine(test)
-	c.PrintLine(test)
-	c.PrintLine("\n\n")
+	fmt.Fprintf(c, "%s\n", spaces)
+	fmt.Fprintf(c, "%s\n", puncts)
+	fmt.Fprintf(c, "%s\n", figsLtrs)
+	fmt.Fprintf(c, "%s\n", "")
+	fmt.Fprintf(c, "%s\n", test)
+	fmt.Fprintf(c, "%s\n", test)
+	fmt.Fprintf(c, "%s\n", test)
+	fmt.Fprintf(c, "%s\n", test)
+	fmt.Fprintf(c, "%s\n", "\n\n")
 }

@@ -19,15 +19,16 @@ func (c *Convert) asciiToBaudot(r rune) ([]baudotBits, bool) {
 	}
 
 	// Get Baudot bits value for ASCII character
-	if bits, ok := baudotConv[r]; !ok {
+	bits, ok := baudotConv[r]
+	if !ok {
 		return nil, false
-	} else {
-		if bitsLtrsFigs, ok := c.shiftLettersFigures(retBits, bits[LTRS_FIGS_BIT]); !ok {
-			return []baudotBits{bits}, true
-		} else {
-			return append(bitsLtrsFigs, bits), true
-		}
 	}
+
+	bitsLtrsFigs, ok := c.shiftLettersFigures(retBits, bits[ltrsFigsBit])
+	if !ok {
+		return []baudotBits{bits}, true
+	}
+	return append(bitsLtrsFigs, bits), true
 }
 
 func (c *Convert) shiftLettersFigures(retBits []baudotBits, shift bool) ([]baudotBits, bool) {
@@ -38,7 +39,6 @@ func (c *Convert) shiftLettersFigures(retBits []baudotBits, shift bool) ([]baudo
 	c.shift = shift
 	if shift {
 		return append(retBits, baudotConv[shiftUp]), true
-	} else {
-		return append(retBits, baudotConv[shiftDown]), true
 	}
+	return append(retBits, baudotConv[shiftDown]), true
 }

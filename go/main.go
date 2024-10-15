@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	baudRate := baudot.BAUD_DELAY_45
+	baudRate := baudot.BaudDelay45
 
 	// Print named file, if one is provided. Otherwise, print test
 	b, err := baudot.New(baudRate)

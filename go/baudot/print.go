@@ -4,65 +4,52 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"unicode"
 )
 
 func (c *Convert) initializeTeletype() {
-	c.printRune(shiftDown)
-	c.printRune(shiftDown)
-	c.printRune(carriageReturn)
-	c.printRune(lineFeed)
-	c.printRune(shiftDown)
+	fmt.Fprintf(c, "%c", shiftDown)
+	fmt.Fprintf(c, "%c", shiftDown)
+	fmt.Fprintf(c, "%c", carriageReturn)
+	fmt.Fprintf(c, "%c", lineFeed)
+	fmt.Fprintf(c, "%c", shiftDown)
 }
 
+// Write makes this "interface compatible" with io.Write() and now fmt.Print/fmt.Fprint can be used
 func (c *Convert) Write(line []byte) (n int, err error) {
-	c.PrintLine(string(line))
+	c.printLine(string(line))
 	return len(line), nil
 }
 
-func (c *Convert) PrintLine(line string) {
+// printLine does do more work than Fprintf("%s"), by handling column positioning and sending
+// a \r\n character to the Teletype.
+func (c *Convert) printLine(line string) {
 	column := 0
 	for _, char := range line {
-		c.printRune(char)
+		fmt.Fprintf(c, "%c", char)
 		column++
 
-		if column > COLUMN_MAX {
-			c.printRune('\n')
+		if column > ColumnMax {
+			fmt.Fprintf(c, "%c", '\n')
 			column = 0
 		}
 		if char == '\n' {
 			column = 0
 		}
 	}
-	c.printRune('\n')
+	fmt.Fprintf(c, "%c", '\n')
 }
 
-func (c *Convert) PrintRune(r rune) {
-	c.printRune(r)
-}
-
-func (c *Convert) printRune(r rune) {
-	rUpper := unicode.ToUpper(r)
-	bitsSlice, ok := c.asciiToBaudot(rUpper)
-	if !ok {
-		return
-	}
-
-	// Give some console feedback. TODO: Make callback function
-	fmt.Printf("%c", rUpper)
-	c.WriteBits(bitsSlice)
-}
-
+// PrintFile sends the entire contents of "file" to the teletype
 func (c *Convert) PrintFile(fname string) error {
-	if fp, err := os.Open(fname); err != nil {
+	fp, err := os.Open(fname)
+	if err != nil {
 		return err
-	} else {
-		defer fp.Close()
+	}
+	defer fp.Close()
 
-		scan := bufio.NewScanner(fp)
-		for scan.Scan() {
-			c.PrintLine(scan.Text())
-		}
+	scan := bufio.NewScanner(fp)
+	for scan.Scan() {
+		fmt.Fprintf(c, "%s", scan.Text())
 	}
 	return nil
 }

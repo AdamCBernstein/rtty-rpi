@@ -2,15 +2,15 @@ package baudot
 
 // Baud speed durations, in microseconds (uSeconds)
 const (
-	BAUD_DELAY_45 = 22000 // 22ms = 45 baud, 60WPM; in uSeconds
-	BAUD_DELAY_50 = 20000 // 20ms = 50 baud, 66WPM; in uSeconds
-	BAUD_DELAY_57 = 18000 // 18ms = 56.9 baud, 75WPM; in uSeconds
-	BAUD_DELAY_74 = 13470 // 13ms = 74 baud, 100WPM; in uSeconds
+	BaudDelay45 = 22000 // 22ms = 45 baud,   60WPM;  in uSeconds
+	BaudDelay50 = 20000 // 20ms = 50 baud,   66WPM;  in uSeconds
+	BaudDelay57 = 18000 // 18ms = 56.9 baud, 75WPM;  in uSeconds
+	BaudDelay74 = 13470 // 13ms = 74 baud,   100WPM; in uSeconds
 )
 
 // Misc constants
 const (
-	COLUMN_MAX = 76
+	ColumnMax = 76
 )
 
 // Symbolic names for rune (ASCII) values used as keys in Baudot table
@@ -27,22 +27,27 @@ const (
 
 // Constants related to Teletype code conversion
 const (
-	LETTERS       = 0x01
-	FIGURES       = 0x02
-	LTRS_FIGS_BIT = 7
+	letters     = 0x01
+	figures     = 0x02
+	ltrsFigsBit = 7
 )
 
 // Define I ("one"; true), O ("zero"; false) to populate Baudot
 // code table below. Makes reading the bool values (bits) easier.
 // These are the letters 'I' and 'O', respectively
+
+// I is "mark", or GPIO on
 const I = true
+
+// O is "space", or GPIO off
 const O = false
 
 // ITA-2 / US-TTY table. Reference:
 // https://en.wikipedia.org/wiki/Baudot_code#ITA_2_and_US-TTY
 //
 // format: bit0-bit6 = | start | D1-D5  | stop |
-//         bit7 = LETTERS / FIGURES shift "bit" value
+//
+//	bit7 = LETTERS / FIGURES shift "bit" value
 //
 // Baudot table format below:
 // S = START-BIT; E=END-BIT; D1-D5=Data Bits L=LETTERS F=FIGURES
@@ -79,8 +84,8 @@ var baudotConv = map[rune]baudotBits{
 	lineFeed:       {O, O, I, O, O, O, I, O}, // LF
 	spaceChar:      {O, O, O, I, O, O, I, O}, // SPACE
 	carriageReturn: {O, O, O, O, I, O, I, O}, // CR
-	FIGURES:        {O, I, I, O, I, I, I, O}, // SHIFT_UP
-	LETTERS:        {O, I, I, I, I, I, I, O}, // SHIFT_DOWN
+	figures:        {O, I, I, O, I, I, I, O}, // SHIFT_UP
+	letters:        {O, I, I, I, I, I, I, O}, // SHIFT_DOWN
 
 	// All entries here are FIGURES; bit7 = 1
 	'-':      {O, I, I, O, O, O, I, I}, // A / -
