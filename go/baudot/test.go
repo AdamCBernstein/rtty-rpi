@@ -20,7 +20,5 @@ func (c *Convert) PrintTest() {
 	fmt.Fprintf(c, "%s\n", "")
 	fmt.Fprintf(c, "%s\n", test)
 	fmt.Fprintf(c, "%s\n", test)
-	fmt.Fprintf(c, "%s\n", test)
-	fmt.Fprintf(c, "%s\n", test)
 	fmt.Fprintf(c, "%s\n", "\n\n")
 }

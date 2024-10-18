@@ -1,6 +1,7 @@
 package baudot
 
 import (
+	"os"
 	"time"
 
 	rpio "github.com/stianeikeland/go-rpio"
@@ -51,6 +52,7 @@ type Convert struct {
 	shift           bool
 	pin             rpio.Pin
 	motor           rpio.Pin
+	printout        *os.File
 }
 
 func (c *Convert) Close() {
@@ -64,9 +66,11 @@ func New(speed int) (*Convert, error) {
 		return nil, err
 	}
 	c := &Convert{bitTimeDuration: time.Duration(speed),
-		shift: false,
-		pin:   rpio.Pin(GPIO0),
-		motor: rpio.Pin(GPIO1)}
+		shift:    false,
+		pin:      rpio.Pin(GPIO0),
+		motor:    rpio.Pin(GPIO1),
+		printout: os.Stdout,
+	}
 	c.pin.Output()
 	c.motor.Output()
 

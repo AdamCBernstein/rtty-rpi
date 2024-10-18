@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"unicode"
 )
 
 func (c *Convert) initializeTeletype() {
@@ -20,23 +21,37 @@ func (c *Convert) Write(line []byte) (n int, err error) {
 	return len(line), nil
 }
 
+func (c *Convert) printRune(r rune) {
+	rUpper := unicode.ToUpper(r)
+	bitsSlice, ok := c.asciiToBaudot(rUpper)
+	if !ok {
+		return
+	}
+
+	// Give some console feedback. TODO: Make callback function
+	if c.printout != nil {
+		fmt.Fprintf(c.printout, "%c", rUpper)
+	}
+	c.WriteBits(bitsSlice)
+}
+
 // printLine does do more work than Fprintf("%s"), by handling column positioning and sending
 // a \r\n character to the Teletype.
 func (c *Convert) printLine(line string) {
 	column := 0
 	for _, char := range line {
-		fmt.Fprintf(c, "%c", char)
+		c.printRune(char)
 		column++
 
 		if column > ColumnMax {
-			fmt.Fprintf(c, "%c", '\n')
+			c.printRune('\n')
 			column = 0
 		}
 		if char == '\n' {
 			column = 0
 		}
 	}
-	fmt.Fprintf(c, "%c", '\n')
+	c.printRune('\n')
 }
 
 // PrintFile sends the entire contents of "file" to the teletype
